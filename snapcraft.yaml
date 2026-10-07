@@ -1,6 +1,7 @@
 name: termlook
 base: core24
 version: '0.1.0'
+license: MIT
 summary: Minimal terminal with workspaces and split panes
 description: |
   A Python and GTK terminal with workspaces, up to four resizable panes,
@@ -39,6 +40,7 @@ parts:
     override-build: |
       # Copy only runtime sources, never checkout metadata or previous .snap files.
       cp -a "$CRAFT_PART_SRC/termlook" "$CRAFT_PART_INSTALL/"
+      install -D -m 644 "$CRAFT_PART_SRC/LICENSE" "$CRAFT_PART_INSTALL/usr/share/doc/termlook/LICENSE"
       install -D -m 755 "$CRAFT_PART_SRC/scripts/run.py" "$CRAFT_PART_INSTALL/scripts/run.py"
       install -D -m 755 "$CRAFT_PART_SRC/scripts/snap_launch.sh" "$CRAFT_PART_INSTALL/scripts/snap_launch.sh"
       install -D -m 644 "$CRAFT_PART_SRC/snap/gui/termlook.desktop" "$CRAFT_PART_INSTALL/snap/gui/termlook.desktop"
