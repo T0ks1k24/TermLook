@@ -10,7 +10,7 @@ On Ubuntu, install the runtime and test dependencies:
 
 ```bash
 sudo apt update
-sudo apt install python3 python3-gi gir1.2-gtk-3.0 gir1.2-vte-2.91 gir1.2-ayatanaappindicator3-0.1 xvfb xauth dbus-x11
+sudo apt install python3 python3-gi librsvg2-common gir1.2-gtk-3.0 gir1.2-vte-2.91 gir1.2-ayatanaappindicator3-0.1 xvfb xauth dbus-x11
 /usr/bin/python3 -m termlook
 ```
 

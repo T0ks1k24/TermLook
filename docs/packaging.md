@@ -65,7 +65,7 @@ Restart Windows if prompted. Open Ubuntu and install dependencies:
 
 ```bash
 sudo apt update
-sudo apt install python3 python3-gi gir1.2-gtk-3.0 gir1.2-vte-2.91
+sudo apt install python3 python3-gi librsvg2-common gir1.2-gtk-3.0 gir1.2-vte-2.91
 cd /path/to/TermLook
 /usr/bin/python3 -m termlook
 ```
