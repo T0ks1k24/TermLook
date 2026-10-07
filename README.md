@@ -1,4 +1,28 @@
-# TermLook
+<p align="center">
+  <img src="termlook/assets/io.termlook.TermLook.svg" width="88" alt="TermLook icon">
+</p>
+
+<h1 align="center">TermLook</h1>
+<p align="center"><strong>A little room for every project.</strong><br>Workspaces, split panes, and your own shell — in a minimal Linux terminal.</p>
+
+<p align="center">
+  <a href="https://github.com/T0ks1k24/TermLook/actions/workflows/ci.yml"><img src="https://github.com/T0ks1k24/TermLook/actions/workflows/ci.yml/badge.svg?branch=main" alt="Build and tests"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-99b8b2" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/platform-Linux-8eb9ee" alt="Linux">
+  <img src="https://img.shields.io/badge/version-0.1.1-c4a0ed" alt="Version 0.1.1">
+</p>
+
+<p align="center"><a href="#run-on-ubuntu">Get started</a> · <a href="#controls">Shortcuts</a> · <a href="CONTRIBUTING.md">Contribute</a> · <a href="https://github.com/T0ks1k24/TermLook/issues">Report an issue</a></p>
+
+![TermLook with two terminal panes and workspace navigation](docs/images/termlook.png)
+
+| Your workspace | Your workflow |
+| --- | --- |
+| **Workspaces & tabs** | Group shells by project and switch between them. |
+| **Up to four panes** | Split horizontally or vertically, resize, and rearrange. |
+| **Lazy restoration** | Saved tabs start a shell only when you first open them. |
+| **Your shell** | Keep using bash, zsh, or another installed shell. |
+| **Appearance & tray** | Adjust fonts and colors; keep sessions running in the background. |
 
 A minimal dark terminal for Ubuntu, built with Python, GTK 3, and VTE. Workspaces appear on the left, with the selected workspace's terminal tabs across the top. Each tab runs its own shell.
 
@@ -12,7 +36,7 @@ end its session; idle sessions are not terminated automatically.
 
 ```bash
 sudo apt update
-sudo apt install python3 python3-gi gir1.2-gtk-3.0 gir1.2-vte-2.91
+sudo apt install python3 python3-gi librsvg2-common gir1.2-gtk-3.0 gir1.2-vte-2.91
 cd /path/to/TermLook
 /usr/bin/python3 -m termlook
 ```
