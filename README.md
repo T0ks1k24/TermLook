@@ -134,3 +134,12 @@ Add actions to `core/controller.py`, their buttons to `ui/`, and external integr
 ## Snap and Windows
 
 See [Packaging and Windows support](docs/packaging.md) for the development Snap recipe, build commands, WSLg setup, and the work required for a native Windows port. The Snap recipe uses classic confinement so tabs run your own shell and configuration; it is a development build and has not yet been tested as a release.
+
+## Contributing
+
+See [Contributing](CONTRIBUTING.md) for development setup, checks, and pull requests.
+Project authors are listed in [Contributors](CONTRIBUTORS.md).
+
+## License
+
+TermLook is licensed under the [MIT License](LICENSE).
