@@ -44,7 +44,7 @@ The GNOME extension does not support classic snaps, so the recipe bundles the GT
 
 ### Before a public release
 
-This recipe is `grade: devel`. The classic build has been tested only on Ubuntu 24.04; test other distributions and desktops before distributing it. Store publication of a classic snap requires manual approval. The Store name must also be registered and available.
+This recipe uses `grade: stable`, which permits stable-channel releases but does not replace release testing or Store approval. Initial releases should use `edge`. The classic build has been tested only on Ubuntu 24.04; test other distributions and desktops before distributing it. Store publication of a classic snap requires manual approval. The Store name must also be registered and available.
 
 Packaging copies only runtime sources, excluding repository metadata and existing Snap artifacts.
 

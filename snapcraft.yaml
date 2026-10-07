@@ -1,35 +1,32 @@
 name: termlook
+title: TermLook
 base: core24
 version: '0.1.1'
 license: MIT
+website: https://github.com/T0ks1k24/TermLook
+source-code: https://github.com/T0ks1k24/TermLook
+issues: https://github.com/T0ks1k24/TermLook/issues
+icon: termlook/assets/io.termlook.TermLook.svg
 summary: Minimal terminal with workspaces and split panes
 description: |
   A Python and GTK terminal with workspaces, up to four resizable panes,
   configurable appearance, keyboard shortcuts, and a tray indicator.
 grade: stable
-confinement: strict
+# A terminal needs the user's host shells, configuration and commands.
+# Store distribution requires approval for classic confinement.
+confinement: classic
 
 apps:
   termlook:
     command: scripts/snap_launch.sh
     desktop: snap/gui/termlook.desktop
-    plugs:
-      - wayland
-      - x11
-      - desktop
-      - desktop-legacy
-      - home
-      - network
-      - network-bind
-      - removable-media
-      - system-observe
 
 parts:
   termlook:
     plugin: nil
     source: .
     build-attributes: [enable-patchelf]
-    build-packages: 
+    build-packages:
       - libglib2.0-bin
     stage-packages:
       - python3.12-minimal
@@ -43,15 +40,12 @@ parts:
       - dconf-gsettings-backend
       - gsettings-desktop-schemas
     override-build: |
-      craftctl default
       cp -a "$CRAFT_PART_SRC/termlook" "$CRAFT_PART_INSTALL/"
       install -D -m 644 "$CRAFT_PART_SRC/LICENSE" "$CRAFT_PART_INSTALL/usr/share/doc/termlook/LICENSE"
       install -D -m 755 "$CRAFT_PART_SRC/scripts/run.py" "$CRAFT_PART_INSTALL/scripts/run.py"
       install -D -m 755 "$CRAFT_PART_SRC/scripts/snap_launch.sh" "$CRAFT_PART_INSTALL/scripts/snap_launch.sh"
       install -D -m 644 "$CRAFT_PART_SRC/snap/gui/termlook.desktop" "$CRAFT_PART_INSTALL/snap/gui/termlook.desktop"
-      if [ -d "$CRAFT_PART_INSTALL/usr/share/glib-2.0/schemas" ]; then
-        glib-compile-schemas "$CRAFT_PART_INSTALL/usr/share/glib-2.0/schemas"
-      fi
+      glib-compile-schemas "$CRAFT_PART_INSTALL/usr/share/glib-2.0/schemas"
     prime:
       - '-**/__pycache__/**'
       - '-**/*.pyc'

@@ -62,6 +62,17 @@ jobs:
             echo 'Unexpected checkout metadata or nested snap in package' >&2
             exit 1
           fi
+      - name: Test installed classic snap
+        env:
+          SNAP_FILE: ${{ steps.build.outputs.snap }}
+          G_DEBUG: fatal-criticals
+          GSETTINGS_BACKEND: memory
+          NO_AT_BRIDGE: '1'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb xauth xdotool dbus-x11
+          sudo snap install "$SNAP_FILE" --dangerous --classic
+          timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_snap.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: snap-amd64
