@@ -1,0 +1,44 @@
+name: Publish Snap
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: snap-store-edge
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Publish to edge
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: snap-store
+    steps:
+      # Download only the artifact built and tested by this workflow run.
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: snap-amd64
+          path: dist
+      - name: Locate snap
+        id: package
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=(dist/*.snap)
+          test "${#files[@]}" -eq 1
+          echo "path=${files[0]}" >> "$GITHUB_OUTPUT"
+      - name: Upload and release
+        uses: canonical/action-publish@214b86e5ca036ead1668c79afb81e550e6c54d40 # v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        with:
+          snap: ${{ steps.package.outputs.path }}
+          release: edge

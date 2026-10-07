@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install GTK and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-gi gir1.2-gtk-3.0 gir1.2-vte-2.91 gir1.2-ayatanaappindicator3-0.1 xvfb xauth dbus-x11
+      - name: Check Python and shell syntax
+        run: |
+          /usr/bin/python3 -m compileall -q termlook scripts tests
+          sh -n scripts/snap_launch.sh
+      - name: Unit tests
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: GTK and VTE lifecycle regression
+        env:
+          G_DEBUG: fatal-criticals
+          GSETTINGS_BACKEND: memory
+          NO_AT_BRIDGE: '1'
+        run: timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_gui.py
+
+  snap:
+    name: Snap build
+    needs: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Build amd64 snap
+        uses: canonical/action-build@3bdaa03e1ba6bf59a65f84a751d943d549a54e79 # v1
+        id: build
+      - name: Check package contents
+        env:
+          SNAP_FILE: ${{ steps.build.outputs.snap }}
+        run: |
+          sudo apt-get install -y squashfs-tools
+          unsquashfs -d "$RUNNER_TEMP/snap-contents" "$SNAP_FILE"
+          test -x "$RUNNER_TEMP/snap-contents/scripts/snap_launch.sh"
+          test -f "$RUNNER_TEMP/snap-contents/termlook/app.py"
+          test -f "$RUNNER_TEMP/snap-contents/snap/gui/termlook.desktop"
+          if find "$RUNNER_TEMP/snap-contents" \( -name .git -o -name .github -o -name '*.snap' \) -print -quit | grep -q .; then
+            echo 'Unexpected checkout metadata or nested snap in package' >&2
+            exit 1
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: snap-amd64
+          path: ${{ steps.build.outputs.snap }}
+          if-no-files-found: error
+          retention-days: 14
