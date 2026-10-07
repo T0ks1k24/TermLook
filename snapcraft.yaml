@@ -1,6 +1,6 @@
 name: termlook
 base: core24
-version: '0.1.0'
+version: '0.1.1'
 license: MIT
 summary: Minimal terminal with workspaces and split panes
 description: |

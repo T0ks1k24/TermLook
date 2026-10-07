@@ -23,12 +23,12 @@ From the project root:
 snapcraft --use-lxd
 ```
 
-The recipe is `snapcraft.yaml` and uses Ubuntu's `core24` base with **classic confinement**. It bundles Python 3.12, PyGObject, GTK, VTE, and Ayatana AppIndicator. A typical x86-64 build produces `termlook_0.1.0_amd64.snap`.
+The recipe is `snapcraft.yaml` and uses Ubuntu's `core24` base with **classic confinement**. It bundles Python 3.12, PyGObject, GTK, VTE, and Ayatana AppIndicator. A typical x86-64 build produces `termlook_0.1.1_amd64.snap`.
 
 Install the actual file produced by your build:
 
 ```bash
-sudo snap install ./termlook_0.1.0_amd64.snap --dangerous --classic
+sudo snap install ./termlook_0.1.1_amd64.snap --dangerous --classic
 snap run termlook
 ```
 

@@ -37,6 +37,8 @@ Run these commands from the repository root:
 sh -n scripts/snap_launch.sh
 G_DEBUG=fatal-criticals GSETTINGS_BACKEND=memory NO_AT_BRIDGE=1 \
   timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_gui.py
+G_DEBUG=fatal-criticals GSETTINGS_BACKEND=memory NO_AT_BRIDGE=1 \
+  timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_lazy.py
 ```
 
 For UI or terminal changes, also test the affected behavior in a real desktop

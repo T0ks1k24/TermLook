@@ -2,6 +2,12 @@
 
 A minimal dark terminal for Ubuntu, built with Python, GTK 3, and VTE. Workspaces appear on the left, with the selected workspace's terminal tabs across the top. Each tab runs its own shell.
 
+In **0.1.1**, restored tabs start their terminals only when first selected. Unopened
+tabs retain their names, directories, and split layouts without allocating terminal
+widgets or starting shells. Once opened, sessions stay alive across tab and workspace
+switches, including background commands and shell variables. Close a tab or pane to
+end its session; idle sessions are not terminated automatically.
+
 ## Run on Ubuntu
 
 ```bash
@@ -89,6 +95,7 @@ The layout is saved to `~/.config/termlook/layout.json` (or `$XDG_CONFIG_HOME/te
 /usr/bin/python3 -m unittest discover -s tests
 # For GUI testing without a display: sudo apt install xvfb
 G_DEBUG=fatal-criticals xvfb-run -a /usr/bin/python3 tests/smoke_gui.py
+G_DEBUG=fatal-criticals dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_lazy.py
 ```
 
 ## Architecture
