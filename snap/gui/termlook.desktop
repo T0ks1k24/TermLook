@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=TermLook
+Comment=Minimal terminal with workspaces and split panes
+Exec=termlook
+Icon=${SNAP}/termlook/assets/io.termlook.TermLook.svg
+Terminal=false
+Categories=System;TerminalEmulator;
+StartupNotify=true
+StartupWMClass=termlook
