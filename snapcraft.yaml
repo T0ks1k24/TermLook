@@ -6,26 +6,32 @@ summary: Minimal terminal with workspaces and split panes
 description: |
   A Python and GTK terminal with workspaces, up to four resizable panes,
   configurable appearance, keyboard shortcuts, and a tray indicator.
-  This development build is intended for local packaging tests.
-grade: devel
-# A host terminal must run the user's own shell, tools, and configuration.
-confinement: classic
+grade: stable
+confinement: strict
 
 apps:
   termlook:
     command: scripts/snap_launch.sh
     desktop: snap/gui/termlook.desktop
+    plugs:
+      - wayland
+      - x11
+      - desktop
+      - desktop-legacy
+      - home
+      - network
+      - network-bind
+      - removable-media
+      - system-observe
 
 parts:
   termlook:
     plugin: nil
     source: .
-    # The GNOME extension does not support classic snaps: bundle the GTK stack
-    # and patch its binaries to load libraries from this snap and core24.
     build-attributes: [enable-patchelf]
-    build-packages: [libglib2.0-bin]
+    build-packages: 
+      - libglib2.0-bin
     stage-packages:
-      # These are part of core24, so they are bundled only when named explicitly.
       - python3.12-minimal
       - libpython3.12-minimal
       - libpython3.12-stdlib
@@ -36,15 +42,16 @@ parts:
       - librsvg2-common
       - dconf-gsettings-backend
       - gsettings-desktop-schemas
-    # Not override-prime: enable-patchelf skips parts that override the prime step.
     override-build: |
-      # Copy only runtime sources, never checkout metadata or previous .snap files.
+      craftctl default
       cp -a "$CRAFT_PART_SRC/termlook" "$CRAFT_PART_INSTALL/"
       install -D -m 644 "$CRAFT_PART_SRC/LICENSE" "$CRAFT_PART_INSTALL/usr/share/doc/termlook/LICENSE"
       install -D -m 755 "$CRAFT_PART_SRC/scripts/run.py" "$CRAFT_PART_INSTALL/scripts/run.py"
       install -D -m 755 "$CRAFT_PART_SRC/scripts/snap_launch.sh" "$CRAFT_PART_INSTALL/scripts/snap_launch.sh"
       install -D -m 644 "$CRAFT_PART_SRC/snap/gui/termlook.desktop" "$CRAFT_PART_INSTALL/snap/gui/termlook.desktop"
-      glib-compile-schemas "$CRAFT_PART_INSTALL/usr/share/glib-2.0/schemas"
+      if [ -d "$CRAFT_PART_INSTALL/usr/share/glib-2.0/schemas" ]; then
+        glib-compile-schemas "$CRAFT_PART_INSTALL/usr/share/glib-2.0/schemas"
+      fi
     prime:
       - '-**/__pycache__/**'
       - '-**/*.pyc'
