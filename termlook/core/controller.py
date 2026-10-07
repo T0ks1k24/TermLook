@@ -8,6 +8,7 @@ class Controller:
         self.save = save
         self.view = None
         self.closed = False
+        self.saved_data = None
 
     def refresh(self):
         if not self.closed:
@@ -18,7 +19,10 @@ class Controller:
         if self.closed:
             return
         try:
-            self.save(self.layout.to_data())
+            data = self.layout.to_data()
+            if data != self.saved_data:
+                self.save(data)
+                self.saved_data = data
             self.view.show_error(None)
         except OSError as error:
             self.view.show_error(f'Could not save layout: {error}')

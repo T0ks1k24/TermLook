@@ -48,7 +48,9 @@ class TerminalSession:
         self.on_directory = on_directory
         self.closed = False
         self.exited = False
-        self.pending = True
+        self.pending = False
+        self.started = False
+        self.pid = None
         self.cancellable = Gio.Cancellable()
         self.menu = None
         self.widget = Vte.Terminal()
@@ -79,6 +81,10 @@ class TerminalSession:
             getattr(terminal, 'set_margin_' + edge)(settings.padding)
 
     def start(self):
+        if self.started or self.closed:
+            return
+        self.started = True
+        self.pending = True
         shell = user_shell(self.settings.shell)
         cwd = self.tab.cwd if Path(self.tab.cwd).is_dir() else str(Path.home())
         # Pass the complete environment so variables removed by shell_environment stay removed.
@@ -89,6 +95,7 @@ class TerminalSession:
 
     def _spawned(self, terminal, pid, error, _data):
         self.pending = False
+        self.pid = pid if error is None else None
         if self.closed:
             self._destroy()
             return
@@ -98,6 +105,7 @@ class TerminalSession:
 
     def _exited(self, terminal, status):
         self.exited = True
+        self.pid = None
         if not self.closed:
             terminal.feed(b'\r\n[Session ended. Ctrl+Shift+T: new terminal.]\r\n')
 
@@ -107,7 +115,7 @@ class TerminalSession:
         uri = terminal.get_current_directory_uri()
         if uri:
             cwd = unquote(urlparse(uri).path)
-            if Path(cwd).is_dir():
+            if cwd != self.tab.cwd and Path(cwd).is_dir():
                 self.tab.cwd = cwd
                 self.on_directory()
 

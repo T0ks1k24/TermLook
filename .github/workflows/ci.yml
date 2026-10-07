@@ -33,7 +33,9 @@ jobs:
           G_DEBUG: fatal-criticals
           GSETTINGS_BACKEND: memory
           NO_AT_BRIDGE: '1'
-        run: timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_gui.py
+        run: |
+          timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_gui.py
+          timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_lazy.py
 
   snap:
     name: Snap build

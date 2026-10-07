@@ -135,21 +135,24 @@ class Window(Gtk.ApplicationWindow):
         for tid in list(self.pane_grids):
             if tid not in tabs:
                 self.pane_grids.pop(tid).dispose()
-        for tid, tab in live.items():
+        # Restored tabs stay as model data until first selected: no VTE or shell.
+        selected = layout.selected.selected
+        for pane in selected.panes:
+            tid = pane.id
             if tid not in self.sessions:
-                session = TerminalSession(tab, lambda: self.dispatch(self.controller.persist), self.settings)
+                session = TerminalSession(pane, lambda: self.dispatch(self.controller.persist), self.settings)
                 self.sessions[tid] = session
                 session.widget.connect('focus-in-event', self._pane_focused, tid)
                 session.widget.show()
                 session.start()
-        for tab in tabs.values():
-            if tab.id not in self.pane_grids:
-                grid = PaneGrid(tab, self.controller, self.dispatch)
-                self.pane_grids[tab.id] = grid
-                self.stack.add_named(grid, tab.id)
-            self.pane_grids[tab.id].render(self.sessions)
+        if selected.id not in self.pane_grids:
+            grid = PaneGrid(selected, self.controller, self.dispatch)
+            self.pane_grids[selected.id] = grid
+            self.stack.add_named(grid, selected.id)
+        # Existing background sessions keep their PTYs and output; only the
+        # selected grid needs layout work when switching tabs or changing panes.
+        self.pane_grids[selected.id].render(self.sessions)
         self.navigation.render(layout)
-        selected = layout.selected.selected
         self.split_button.set_sensitive(len(selected.panes) < 4)
         self.split_down_button.set_sensitive(len(selected.panes) < 4)
         self.zoom_button.set_sensitive(len(selected.panes) > 1)
