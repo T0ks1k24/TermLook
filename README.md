@@ -32,6 +32,29 @@ widgets or starting shells. Once opened, sessions stay alive across tab and work
 switches, including background commands and shell variables. Close a tab or pane to
 end its session; idle sessions are not terminated automatically.
 
+## Install on Ubuntu 24.04
+
+Download the `termlook-deb` artifact from a successful [build](https://github.com/T0ks1k24/TermLook/actions/workflows/ci.yml), unzip it, and install:
+
+```bash
+sudo apt install ./termlook_0.1.1_all.deb
+termlook
+```
+
+APT installs the GTK/VTE dependencies. The package adds an application-menu entry
+and uses your host shell directly. Install a newer `.deb` with the same command to
+upgrade. Remove it with `sudo apt remove termlook`; your settings remain in
+`~/.config/termlook`. These downloads do not configure an automatic-update repository.
+
+Build locally with `/usr/bin/python3 scripts/build_deb.py`; the file appears in `dist/`.
+The package contains Python sources and is marked `Architecture: all`; automated
+installation tests currently run on Ubuntu 24.04 amd64.
+
+If you previously installed the checkout launcher with `scripts/install_desktop.py`,
+remove `~/.local/share/applications/io.termlook.TermLook.desktop` so it no longer
+shadows the package's system launcher. Quit a running Snap or source instance before
+starting the installed package; all editions share the same application ID.
+
 ## Run on Ubuntu
 
 ```bash

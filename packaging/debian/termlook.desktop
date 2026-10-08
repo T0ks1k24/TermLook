@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=TermLook
+Comment=Terminal with workspaces and split panes
+Exec=termlook
+Icon=io.termlook.TermLook
+Terminal=false
+Categories=System;TerminalEmulator;
+StartupNotify=true
+StartupWMClass=termlook

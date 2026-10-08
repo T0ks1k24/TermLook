@@ -3,6 +3,7 @@
 Run in a fresh D-Bus session, with snap installed and xdotool available.
 The temporary settings and shell probe never modify the user's configuration.
 """
+import argparse
 import json
 import os
 from pathlib import Path
@@ -30,7 +31,12 @@ def window_id():
     return result.stdout.splitlines()[0] if result.returncode == 0 else None
 
 
-with tempfile.TemporaryDirectory(prefix='termlook-snap-test-') as directory:
+parser = argparse.ArgumentParser()
+parser.add_argument('--deb', action='store_true', help='Test the installed Debian package')
+args = parser.parse_args()
+command_to_run = ['/usr/bin/termlook'] if args.deb else ['snap', 'run', 'termlook']
+
+with tempfile.TemporaryDirectory(prefix='termlook-package-test-') as directory:
     root = Path(directory)
     config = root / 'config' / 'termlook'
     config.mkdir(parents=True)
@@ -45,7 +51,7 @@ with tempfile.TemporaryDirectory(prefix='termlook-snap-test-') as directory:
              'snap=os.environ.get("SNAP"),ld=os.environ.get("LD_LIBRARY_PATH"))))')
     command = '/usr/bin/python3 -c ' + shlex.quote(probe)
     env = dict(os.environ, XDG_CONFIG_HOME=str(root / 'config'), SHELL='/bin/bash')
-    process = subprocess.Popen(['snap', 'run', 'termlook'], env=env)
+    process = subprocess.Popen(command_to_run, env=env, cwd=directory)
     try:
         window = wait_for(window_id, process, 'the packaged GUI')
         subprocess.run(['xdotool', 'windowfocus', '--sync', window], check=True)
@@ -68,4 +74,4 @@ with tempfile.TemporaryDirectory(prefix='termlook-snap-test-') as directory:
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
-print('Installed Snap passed: GUI, host bash, host command, HOME, cwd, clean environment, quit')
+print('Installed package passed: GUI, host bash, host command, HOME, cwd, clean environment, quit')

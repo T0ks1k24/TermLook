@@ -37,45 +37,27 @@ jobs:
           timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_gui.py
           timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_lazy.py
 
-  snap:
-    name: Snap build
+  deb:
+    name: DEB build
     needs: tests
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Build amd64 snap
-        uses: canonical/action-build@3bdaa03e1ba6bf59a65f84a751d943d549a54e79 # v1
-        id: build
-      - name: Check package contents
-        env:
-          SNAP_FILE: ${{ steps.build.outputs.snap }}
-        run: |
-          sudo apt-get install -y squashfs-tools
-          unsquashfs -d "$RUNNER_TEMP/snap-contents" "$SNAP_FILE"
-          test -x "$RUNNER_TEMP/snap-contents/scripts/snap_launch.sh"
-          test -f "$RUNNER_TEMP/snap-contents/termlook/app.py"
-          test -f "$RUNNER_TEMP/snap-contents/snap/gui/termlook.desktop"
-          if find "$RUNNER_TEMP/snap-contents" \( -name .git -o -name .github -o -name '*.snap' \) -print -quit | grep -q .; then
-            echo 'Unexpected checkout metadata or nested snap in package' >&2
-            exit 1
-          fi
-      - name: Test installed classic snap
-        env:
-          SNAP_FILE: ${{ steps.build.outputs.snap }}
-          G_DEBUG: fatal-criticals
-          GSETTINGS_BACKEND: memory
-          NO_AT_BRIDGE: '1'
+      - name: Build Debian package
+        run: /usr/bin/python3 scripts/build_deb.py
+      - name: Install and validate package
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb xauth xdotool dbus-x11
-          sudo snap install "$SNAP_FILE" --dangerous --classic
-          timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_snap.py
+          sudo apt-get install -y ./dist/termlook_*_all.deb xvfb xauth xdotool dbus-x11 desktop-file-utils
+          desktop-file-validate /usr/share/applications/io.termlook.TermLook.desktop
+          cd /tmp
+          G_DEBUG=fatal-criticals GSETTINGS_BACKEND=memory NO_AT_BRIDGE=1 timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 "$GITHUB_WORKSPACE/tests/smoke_snap.py" --deb
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: snap-amd64
-          path: ${{ steps.build.outputs.snap }}
+          name: termlook-deb
+          path: dist/*.deb
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30

@@ -15,9 +15,13 @@ jobs:
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/ci.yml
 
+  build-snap:
+    needs: verify
+    uses: ./.github/workflows/snap-build.yml
+
   publish:
     name: Publish to edge
-    needs: verify
+    needs: build-snap
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: snap-store
