@@ -1,54 +1,35 @@
 # Packaging and Windows support
 
-## Status
+## Debian package (Ubuntu 24.04)
 
-The repository includes an initial **development Snap recipe**, not a verified release artifact. Build it on Ubuntu and test it before distributing it. Snapcraft packages Python and native dependencies; it does not convert the application into a native executable.
-
-## Build a development Snap
-
-Install Snapcraft and its build environment on Ubuntu:
+Build from the repository root without sudo:
 
 ```bash
-sudo snap install snapcraft --classic
-sudo snap install lxd
-sudo lxd init --auto
-sudo usermod -aG lxd "$USER"
+/usr/bin/python3 scripts/build_deb.py
+sudo apt install ./dist/termlook_0.1.1_all.deb
+termlook
 ```
 
-If LXD is already configured, keep its existing configuration. After adding yourself to the group, log out and back in. LXD group membership grants powerful access to the host.
+The version comes from `VERSION`. The package includes the Python application,
+launcher, desktop entry, icon, and MIT license. GTK, VTE, and Python are system
+package dependencies installed by APT. The optional tray backend is recommended.
+No isolated runtime is used: shells run directly in the host environment.
 
-From the project root:
+CI builds the package and tests installation, desktop-file validity, GUI startup,
+host shell commands, working directory, environment, and application shutdown on
+Ubuntu 24.04 amd64. The package is `Architecture: all` because it contains Python
+sources; other distributions and architectures still need validation.
+
+Install an updated package using the same `apt install ./...deb` command.
+`sudo apt remove termlook` removes the application while preserving user settings.
+No automatic-update APT repository is configured.
+
+For installed-package testing with `xvfb`, `xauth`, `xdotool`, and `dbus-x11` installed:
 
 ```bash
-snapcraft --use-lxd
+G_DEBUG=fatal-criticals GSETTINGS_BACKEND=memory NO_AT_BRIDGE=1 \
+  timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_deb.py
 ```
-
-The recipe is `snapcraft.yaml` and uses Ubuntu's `core24` base with **classic confinement**. It bundles Python 3.12, PyGObject, GTK, VTE, and Ayatana AppIndicator. A typical x86-64 build produces `termlook_0.1.1_amd64.snap`.
-
-Install the actual file produced by your build:
-
-```bash
-sudo snap install ./termlook_0.1.1_amd64.snap --dangerous --classic
-snap run termlook
-```
-
-`--dangerous` allows a local package without a Store signature. `--classic` accepts the confinement the recipe requires. If an older strict or devmode build is installed, remove it first with `sudo snap remove termlook`; snapd keeps a snapshot of its data. Install a newer local build the same way.
-
-Test shell startup, host commands, working directories, all split layouts, clipboard, settings persistence, and tray behavior on both X11 and Wayland. The desktop must provide an AppIndicator host for the tray icon.
-
-### Why classic confinement
-
-A strict or devmode snap runs in its own mount namespace with `core24` as the root filesystem and `~/snap/termlook/<revision>` as `$HOME`. Host shells such as `/usr/bin/zsh`, their configuration, and host commands are not visible there, so a confined build can only offer the base system's bash. Classic confinement runs TermLook on the host filesystem: tabs start the user's login shell with the real `$HOME`, and settings are shared with a source checkout in `~/.config/termlook`.
-
-The GNOME extension does not support classic snaps, so the recipe bundles the GTK stack itself. `enable-patchelf` points the bundled binaries at this snap's libraries and the `core24` dynamic linker. `scripts/snap_launch.sh` sets the library, typelib, schema, GIO module, pixbuf loader, and input method paths, and records each original value in `TERMLOOK_SNAP_ORIG_<NAME>`. Before spawning a shell, `termlook.services.terminal.shell_environment()` restores those values and removes `SNAP*` variables, so shells and programs started from TermLook see the user's environment rather than the bundled runtime. Host themes, icons, fonts, and GNOME settings remain visible.
-
-### Before a public release
-
-This recipe uses `grade: stable`, which permits stable-channel releases but does not replace release testing or Store approval. Initial releases should use `edge`. The classic build has been tested only on Ubuntu 24.04; test other distributions and desktops before distributing it. Store publication of a classic snap requires manual approval. The Store name must also be registered and available.
-
-Packaging copies only runtime sources, excluding repository metadata and existing Snap artifacts.
-
-Official references: [GNOME extension](https://ubuntu.com/docs/snapcraft/9/reference/extensions/gnome-extension/), [confinement](https://snapcraft.io/docs/explanation/security/snap-confinement/), [classic review criteria](https://snapcraft.io/docs/reference/administration/reviewing-classic-confinement-snaps/).
 
 ## Windows: run the current application with WSLg
 

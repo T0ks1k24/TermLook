@@ -16,7 +16,7 @@ sudo apt install python3 python3-gi librsvg2-common gir1.2-gtk-3.0 gir1.2-vte-2.
 
 Use system Python so it can load the GTK and VTE packages installed through apt.
 See the [README](README.md) for application behavior and the code structure, and
-[packaging documentation](docs/packaging.md) for local Snap builds.
+[packaging documentation](docs/packaging.md) for local Debian package builds.
 
 ## Making changes
 
@@ -25,7 +25,7 @@ See the [README](README.md) for application behavior and the code structure, and
   `termlook/services`, and UI changes in `termlook/ui`.
 - Add or update regression tests for changed behavior and bug fixes.
 - Update user documentation when controls or behavior change.
-- Do not commit generated Snap packages, Python caches, or credentials.
+- Do not commit generated packages, Python caches, or credentials.
 
 ## Checking your changes
 
@@ -34,7 +34,7 @@ Run these commands from the repository root:
 ```bash
 /usr/bin/python3 -m unittest discover -s tests -v
 /usr/bin/python3 -m compileall -q termlook scripts tests
-sh -n scripts/snap_launch.sh
+sh -n packaging/debian/termlook
 G_DEBUG=fatal-criticals GSETTINGS_BACKEND=memory NO_AT_BRIDGE=1 \
   timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/smoke_gui.py
 G_DEBUG=fatal-criticals GSETTINGS_BACKEND=memory NO_AT_BRIDGE=1 \
@@ -53,7 +53,7 @@ Use descriptive commit messages. The maintainer, @T0ks1k24, reviews contribution
 and decides whether to merge them.
 
 For bug reports, include steps to reproduce, expected and actual behavior, and
-whether you ran from source or a Snap. Remove private terminal output and paths
+whether you ran from source or a Debian package. Remove private terminal output and paths
 from logs before sharing them.
 
 Contributions are made under the project's [MIT license](LICENSE).

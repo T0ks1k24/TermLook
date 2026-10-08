@@ -25,7 +25,7 @@ jobs:
       - name: Check Python and shell syntax
         run: |
           /usr/bin/python3 -m compileall -q termlook scripts tests
-          sh -n scripts/snap_launch.sh
+          sh -n packaging/debian/termlook
       - name: Unit tests
         run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: GTK and VTE lifecycle regression
@@ -54,7 +54,7 @@ jobs:
           sudo apt-get install -y ./dist/termlook_*_all.deb xvfb xauth xdotool dbus-x11 desktop-file-utils
           desktop-file-validate /usr/share/applications/io.termlook.TermLook.desktop
           cd /tmp
-          G_DEBUG=fatal-criticals GSETTINGS_BACKEND=memory NO_AT_BRIDGE=1 timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 "$GITHUB_WORKSPACE/tests/smoke_snap.py" --deb
+          G_DEBUG=fatal-criticals GSETTINGS_BACKEND=memory NO_AT_BRIDGE=1 timeout 90s dbus-run-session -- xvfb-run -a /usr/bin/python3 "$GITHUB_WORKSPACE/tests/smoke_deb.py"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: termlook-deb

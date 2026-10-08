@@ -32,8 +32,7 @@ body:
       label: Installation
       options:
         - Source checkout
-        - Locally built Snap
-        - Snap Store
+        - Debian package (.deb)
     validations:
       required: true
   - type: textarea

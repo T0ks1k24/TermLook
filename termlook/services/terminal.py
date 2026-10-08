@@ -21,22 +21,8 @@ def user_shell(configured=''):
 
 
 def shell_environment(environ):
-    """Return the shell's environment from KEY=VALUE strings, without snap launcher changes.
-
-    The classic snap launcher lists the variables it overrides in TERMLOOK_SNAP_RESTORE and
-    keeps each original value in TERMLOOK_SNAP_ORIG_<NAME>; a missing original means unset.
-    """
+    """Preserve the host environment and advertise the terminal's capabilities."""
     env = dict(item.split('=', 1) for item in environ if '=' in item)
-    restore = env.pop('TERMLOOK_SNAP_RESTORE', None)
-    if restore is not None:
-        for name in restore.split():
-            original = env.pop('TERMLOOK_SNAP_ORIG_' + name, None)
-            if original is None:
-                env.pop(name, None)
-            else:
-                env[name] = original
-        for name in [name for name in env if name == 'SNAP' or name.startswith('SNAP_')]:
-            del env[name]
     env['TERM'] = 'xterm-256color'
     return [name + '=' + value for name, value in env.items()]
 

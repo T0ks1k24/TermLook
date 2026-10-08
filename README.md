@@ -52,7 +52,7 @@ installation tests currently run on Ubuntu 24.04 amd64.
 
 If you previously installed the checkout launcher with `scripts/install_desktop.py`,
 remove `~/.local/share/applications/io.termlook.TermLook.desktop` so it no longer
-shadows the package's system launcher. Quit a running Snap or source instance before
+shadows the package's system launcher. Quit any running TermLook instance before
 starting the installed package; all editions share the same application ID.
 
 ## Run on Ubuntu
@@ -177,7 +177,7 @@ termlook/
 scripts/
   run.py                 # Launch from any working directory
   install_desktop.py     # Install application icon and menu entry
-  snap_launch.sh         # Classic snap entry point for the bundled GTK stack
+  build_deb.py           # Build the native Debian package
 tests/                  # Model, persistence, and GTK/VTE tests
 ```
 
@@ -185,9 +185,9 @@ tests/                  # Model, persistence, and GTK/VTE tests
 
 Add actions to `core/controller.py`, their buttons to `ui/`, and external integrations to `services/`. UI actions run through `Window.dispatch()`, so widget changes happen after the current GTK event finishes. Closing a session disconnects its signals and cancels startup; its widget is retained until the startup callback completes.
 
-## Snap and Windows
+## Packaging and Windows
 
-See [Packaging and Windows support](docs/packaging.md) for the development Snap recipe, build commands, WSLg setup, and the work required for a native Windows port. The Snap recipe uses classic confinement so tabs run your own shell and configuration; it is a development build and has not yet been tested as a release.
+See [Packaging and Windows support](docs/packaging.md) for Debian package builds, WSLg setup, and the work required for a native Windows port.
 
 ## Contributing
 
